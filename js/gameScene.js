@@ -13,18 +13,18 @@ class GameScene extends Phaser.Scene {
   /**
    * create an shigaraki
    */
-  createShigaraki() {
-    const shigarakiYLocation = Math.floor(Math.random() * 1080) + 1 // this will get a number between 1 and 1080
-    let shigarakiXVelocity = Math.floor(1 * 920) // this will get a number between 1 and 50
-    shigarakiXVelocity *= Math.round(Math.random()) ? -1 : -1 // this will add minus sign in 50% of cases
-    const aShigaraki = this.physics.add.sprite(
+  createTom() {
+    const TomYLocation = Math.floor(Math.random() * 1080) + 1 // this will get a number between 1 and 1080
+    let TomXVelocity = Math.floor(1 * 920) // this will get a number between 1 and 50
+    TomXVelocity *= Math.round(Math.random()) ? -1 : -1 // this will add minus sign in 50% of cases
+    const aTom = this.physics.add.sprite(
       1920,
-      shigarakiYLocation,
-      "shigaraki"
+      TomYLocation,
+      "Tom"
     )
-    aShigaraki.body.velocity.y = 30
-    aShigaraki.body.velocity.x = shigarakiXVelocity
-    this.shigarakiGroup.add(aShigaraki)
+    aTom.body.velocity.y = 30
+    aTom.body.velocity.x = TomXVelocity
+    this.TomGroup.add(aTom)
   }
 
   /**
@@ -35,8 +35,8 @@ class GameScene extends Phaser.Scene {
 
     this.background = null
     this.background2 = null
-    this.bakugou = null
-    this.fireExplosion = false
+    this.Jerry = null
+    this.Rope = false
     this.score = 0
     this.scoreText = null
 
@@ -70,12 +70,12 @@ class GameScene extends Phaser.Scene {
     console.log("Game Scene")
     //images
     this.load.image("startbackground", "./assets/menu-background.png")
-    this.load.image("Jerry", "./assets/Jerry.png")
-    this.load.image("rope", "./assets/rope.png")
-    this.load.image("shigaraki", "./assets/shig.png")
+    this.load.image("Jerry", "./assets/Jerrytest.png")
+    this.load.image("mousetrap", "./assets/Mousetrap.png")
+    this.load.image("Tom", "./assets/Tom.png")
     // sound
-    this.load.audio("die", "./assets/dieaudio.mp3")
-    this.load.audio("bomb", "./assets/explosion.mp3")
+    this.load.audio("Scream", "./assets/Scream.mp3")
+    this.load.audio("Throw", "./assets/Throw.mp3")
   }
 
   /**
@@ -98,38 +98,38 @@ class GameScene extends Phaser.Scene {
       this.scoreTextStyle
     )
 
-    this.bakugou = this.physics.add.sprite(1920 / 6, 1080 - 200, "bakugou")
+    this.Jerry = this.physics.add.sprite(1920 / 6, 1080 - 200, "Jerry")
 
-    // create a group for the explosions
-    this.explosionGroup = this.physics.add.group()
+    // create a group for the Rope
+    this.RopeGroup = this.physics.add.group()
 
-    // create a group for the shigarakis
-    this.shigarakiGroup = this.add.group()
-    this.createShigaraki()
+    // create a group for the Tom
+    this.TomGroup = this.add.group()
+    this.createTom()
 
-    //Collisions between explosions and shigarakis
+    //Collisions between Rope and Tom
     this.physics.add.collider(
-      this.explosionGroup,
-      this.shigarakiGroup,
-      function (explosionCollide, shigarakiCollide) {
-        shigarakiCollide.destroy()
-        explosionCollide.destroy()
+      this.RopeGroup,
+      this.TomGroup,
+      function (RopeCollide, TomCollide) {
+        TomCollide.destroy()
+        RopeCollide.destroy()
         this.score = this.score + 1
         this.scoreText.setText("Score: " + this.score.toString())
-        this.createShigaraki()
-        this.createShigaraki()
+        this.createTom()
+        this.createTom()
       }.bind(this)
     )
 
-    // Collisions between bakugou and shigarakis
+    // Collisions between Jerry and Tom
     this.physics.add.collider(
-      this.bakugou,
-      this.shigarakiGroup,
-      function (bakugouCollide, shigarakiCollide) {
-        this.sound.play("die")
+      this.Jerry,
+      this.TomGroup,
+      function (JerryCollide, TomCollide) {
+        this.sound.play("Scream")
         this.physics.pause()
-        shigarakiCollide.destroy()
-        bakugouCollide.destroy()
+        TomCollide.destroy()
+        JerryCollide.destroy()
         this.gameOverText = this.add
           .text(
             1920 / 2,
@@ -172,31 +172,31 @@ class GameScene extends Phaser.Scene {
     }
 
     if (keyUpObj.isDown === true) {
-      this.bakugou.y -= 15
-      if (this.bakugou.y < 0) {
-        this.bakugou.y = 0
+      this.Jerry.y -= 15
+      if (this.Jerry.y < 0) {
+        this.Jerry.y = 0
       }
     }
 
     // Moves the character down
     if (keyDownObj.isDown === true) {
-      this.bakugou.y += 15
-      if (this.bakugou.y > 1080) {
-        this.bakugou.y = 1080
+      this.Jerry.y += 15
+      if (this.Jerry.y > 1080) {
+        this.Jerry.y = 1080
       }
     }
 
     if (keySpaceObj.isDown === true) {
       if (this.fireExplosion === false) {
-        // fire explosion
+        // fire Rope
         this.fireExplosion = true
-        const aNewexplosion = this.physics.add.sprite(
-          this.bakugou.x,
-          this.bakugou.y,
-          "explosion"
+        const aNewRope = this.physics.add.sprite(
+          this.Jerry.x,
+          this.Jerry.y,
+          "mousetrap"
         )
-        this.explosionGroup.add(aNewexplosion)
-        this.sound.play("bomb")
+        this.RopeGroup.add(aNewRope)
+        this.sound.play("Throw")
       }
     }
 
@@ -204,7 +204,7 @@ class GameScene extends Phaser.Scene {
       this.fireExplosion = false
     }
 
-    this.explosionGroup.children.each(function (item) {
+    this.RopeGroup.children.each(function (item) {
       item.x = item.x + 15
       if (item.x < 0) {
         item.destroy()
